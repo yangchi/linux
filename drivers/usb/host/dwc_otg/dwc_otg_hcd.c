@@ -595,6 +595,8 @@ int dwc_otg_hcd_urb_dequeue(dwc_otg_hcd_t * hcd,
 	DWC_DEBUGPL(DBG_HCD, "DWC OTG HCD URB Dequeue - "
                     "delete %sQueue handler\n",
                     hcd->core_if->dma_desc_enable?"DMA ":"");
+#if 0
+	// Do not deactivate here, leave it to continue through to complete
 	if (!hcd->core_if->dma_desc_enable) {
 		uint8_t b = urb_qtd->in_process;
 		dwc_otg_hcd_qtd_remove_and_free(hcd, urb_qtd, qh);
@@ -607,6 +609,7 @@ int dwc_otg_hcd_urb_dequeue(dwc_otg_hcd_t * hcd,
 	} else {
 		dwc_otg_hcd_qtd_remove_and_free(hcd, urb_qtd, qh);
 	}
+#endif
 	return 0;
 }
 
