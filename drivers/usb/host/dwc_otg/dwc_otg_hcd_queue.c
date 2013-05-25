@@ -728,6 +728,22 @@ void dwc_otg_hcd_qh_remove(dwc_otg_hcd_t * hcd, dwc_otg_qh_t * qh)
 {
 	gintmsk_data_t intr_mask = {.d32 = 0 };
 
+	// Check to see if this qh still has a channel assigned and release it if so
+	if(qh->channel)
+	{
+		dwc_irqflags_t flags;
+
+		DWC_SPINLOCK_IRQSAVE(hcd->channel_lock, &flags);
+		dwc_otg_hc_cleanup(hcd->core_if, qh->channel);
+		DWC_CIRCLEQ_INSERT_TAIL(&hcd->free_hc_list, qh->channel, hc_list_entry);
+
+		hcd->available_host_channels++;
+		fiq_print(FIQDBG_PORTHUB, "AHC = %d ", hcd->available_host_channels);
+		
+		qh->channel = NULL;
+		DWC_SPINUNLOCK_IRQRESTORE(hcd->channel_lock, flags);
+	}
+
 	if (DWC_LIST_EMPTY(&qh->qh_list_entry)) {
 		/* QH is not in a schedule. */
 		return;
