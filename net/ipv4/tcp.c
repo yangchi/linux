@@ -1026,6 +1026,8 @@ int tcp_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 	bool sg;
 	long timeo;
 
+	printk("In the net/ipv4/tcp.c: tcp_sendmsg\n");
+
 	lock_sock(sk);
 
 	flags = msg->msg_flags;
